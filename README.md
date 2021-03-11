@@ -37,7 +37,7 @@ The real image is 300px wide and 0.6976744186046512 is calculated by dividing th
 ## How to install
 
 ```javascript
-npm install --save metalsmith-image-aspect-ratio
+npm install --save-dev metalsmith-image-aspect-ratio
 ```
 
 ## How to use
