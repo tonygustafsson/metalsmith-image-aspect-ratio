@@ -1,0 +1,1 @@
+# Metalsmith Image Aspect Ratio
