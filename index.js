@@ -1,6 +1,7 @@
 var debug = require('debug')('metalsmith:imageAspectRatio');
 var multimatch = require('multimatch');
 var sizeOf = require('image-size');
+var cheerio = require('cheerio');
 
 module.exports = plugin;
 
@@ -9,8 +10,6 @@ function plugin(opts) {
     opts.imagePattern = opts.imagePattern || ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.webp'];
 
     var totalImagesFixed = 0;
-    var imageRegex = /<img(.*?)>/g;
-    var imageSourceRegex = /src\s*=\s*"(.+?)"/;
     var images = {};
 
     return function (files, metalsmith, done) {
@@ -23,8 +22,6 @@ function plugin(opts) {
 
                 // Save image dimensions for later use
                 images[file] = sizeOf(image.contents);
-
-                debug('imageAspectRatio got dimensions for: %s', file);
             }
         });
 
@@ -37,41 +34,29 @@ function plugin(opts) {
                     return;
                 }
 
-                var html = document.contents.toString();
-                var imagesFound = html.match(imageRegex);
+                var $ = cheerio.load(document.contents.toString());
+                var $imagesFound = $('.article__content img');
 
-                if (!imagesFound) {
-                    return;
-                }
+                totalImagesFixed += $imagesFound.length;
 
-                totalImagesFixed += imagesFound.length;
-
-                imagesFound.forEach((image) => {
+                $imagesFound.each(function () {
                     // For each image found in current document
-                    var src = image.match(imageSourceRegex);
+                    var $image = $(this);
+                    var matchingImage = images[$image.attr('src').replace('../', '')];
 
-                    if (src.length >= 1) {
-                        var imageSource = src[1];
-                        var matchingImage = images[imageSource.replace('../', '')];
-
-                        if (!matchingImage) {
-                            debug("imageAspectRatio couldn't find dimensions for %s", file);
-                            return;
-                        }
-
-                        // Add aspect ratio based on the actual width/height
-                        var aspectRatio = matchingImage.width / matchingImage.height;
-                        var style = `aspect-ratio: ${aspectRatio}`;
-                        var newImage = image.replace(
-                            imageSourceRegex,
-                            `src="${imageSource}" style="${style}" width="${matchingImage.width}"`
-                        );
-
-                        html = html.replace(image, newImage);
+                    if (!matchingImage) {
+                        debug("imageAspectRatio couldn't find dimensions for %s", file);
+                        return;
                     }
+
+                    // Add aspect ratio based on the actual width/height
+                    var aspectRatio = matchingImage.width / matchingImage.height;
+
+                    $image.attr('width', matchingImage.width);
+                    $image.css('aspect-ratio', aspectRatio);
                 });
 
-                document.contents = Buffer.from(html);
+                document.contents = Buffer.from($.html());
             }
         });
 
