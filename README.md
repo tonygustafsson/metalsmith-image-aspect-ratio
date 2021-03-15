@@ -40,6 +40,10 @@ The real image is 300px wide and 0.6976744186046512 is calculated by dividing th
 npm install --save-dev metalsmith-image-aspect-ratio
 ```
 
+## Limitations
+
+This plugin only works for locally stored images, not from CDNs. In order to calculate the aspect ratio, the actual file needs to be measured. To do that, we would need to download the images from the CDN first. Might come in the future though.
+
 ## How to use
 
 Add this to the top:
