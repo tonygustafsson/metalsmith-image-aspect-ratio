@@ -5,9 +5,13 @@ var cheerio = require('cheerio');
 
 module.exports = plugin;
 
+function getExtensionFromName(filename) {
+    return filename.split('.').pop();
+}
+
 function plugin(opts) {
-    opts.documentPattern = opts.documentPattern || '**/*.html';
-    opts.imagePattern = opts.imagePattern || ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.webp'];
+    opts.pattern = opts.pattern || '**/*.html';
+    opts.imageExtensions = opts.imageExtensions || ['png', 'jpg', 'jpeg', 'gif', 'webp'];
 
     var totalImagesFixed = 0;
     var images = {};
@@ -17,7 +21,7 @@ function plugin(opts) {
 
         // Collect image information
         Object.keys(files).forEach(function (file) {
-            if (multimatch(file, opts.imagePattern).length) {
+            if (opts.imageExtensions.includes(getExtensionFromName(file))) {
                 var image = files[file];
 
                 // Save image dimensions for later use
@@ -27,7 +31,7 @@ function plugin(opts) {
 
         // Go through documents and update the images
         Object.keys(files).forEach(function (file) {
-            if (multimatch(file, opts.documentPattern).length) {
+            if (multimatch(file, opts.pattern).length) {
                 var document = files[file];
 
                 if (!document.contents) {

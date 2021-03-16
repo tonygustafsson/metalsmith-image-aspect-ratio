@@ -57,12 +57,14 @@ You then use it like so;
 ```javascript
 Metalsmith(__dirnam).use(
     imageAspectRatio({
-        documentPattern: '**/*.html',
-        imagePattern: ['**/*.png', '**/*.jpg', '**/*.webp'],
+        pattern: '**/*.html',
+        imageExtensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
     })
 );
 ```
 
 You should add imageAspectRatio() after it has compiled to HTML. You can of course change the pattern for documents and images if you are using different formats.
+
+```pattern``` defines which files to look for image references in. ```imageExtensions``` defines which types of image extensions the plugin will look for. You will not get the aspect ratio for images not defined here.
 
 That's all there is to it.
