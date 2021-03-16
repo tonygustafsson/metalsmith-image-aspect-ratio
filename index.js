@@ -45,7 +45,7 @@ function plugin(opts) {
                     var matchingImage = images[$image.attr('src').replace('../', '')];
 
                     if (!matchingImage) {
-                        debug("imageAspectRatio couldn't find dimensions for %s", file);
+                        debug("imageAspectRatio couldn't find dimensions for %s", $image.attr('src'));
                         return;
                     }
 
