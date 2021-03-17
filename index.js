@@ -22,10 +22,10 @@ function plugin(opts) {
         // Collect image information
         Object.keys(files).forEach(function (file) {
             if (opts.imageExtensions.includes(getExtensionFromName(file))) {
-                var image = files[file];
+                var imageData = files[file];
 
                 // Save image dimensions for later use
-                images[file] = sizeOf(image.contents);
+                images[file] = sizeOf(imageData.contents);
             }
         });
 
@@ -41,17 +41,26 @@ function plugin(opts) {
                 var $ = cheerio.load(document.contents.toString());
                 var $imagesFound = $('.article__content img');
 
-                totalImagesFixed += $imagesFound.length;
-
                 $imagesFound.each(function () {
                     // For each image found in current document
                     var $image = $(this);
-                    var matchingImage = images[$image.attr('src').replace('../', '')];
+
+                    // Get the image source and remove leading dots and slashes
+                    // To make it easier to find the image on the stored object
+                    var imageSource = $image.attr('src').replace(/^[\/\.]+/g, '');
+                    var matchingImage = images[imageSource];
 
                     if (!matchingImage) {
-                        debug("imageAspectRatio couldn't find dimensions for %s", $image.attr('src'));
+                        var remoteImagePattern = /^https?:\/\//i;
+                        if (!remoteImagePattern.test(imageSource)) {
+                            // Only warn for local images that wasn't found
+                            debug("imageAspectRatio couldn't find dimensions for %s", imageSource);
+                        }
+
                         return;
                     }
+
+                    totalImagesFixed++;
 
                     // Add aspect ratio based on the actual width/height
                     var aspectRatio = matchingImage.width / matchingImage.height;
