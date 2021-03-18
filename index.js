@@ -12,6 +12,7 @@ function getExtensionFromName(filename) {
 function plugin(opts) {
     opts.pattern = opts.pattern || '**/*.html';
     opts.imageExtensions = opts.imageExtensions || ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+    opts.imagesContainerClassName = opts.imagesContainerClassName || '.article__content img';
 
     var totalImagesFixed = 0;
     var images = {};
@@ -39,7 +40,7 @@ function plugin(opts) {
                 }
 
                 var $ = cheerio.load(document.contents.toString());
-                var $imagesFound = $('.article__content img');
+                var $imagesFound = $(opts.imagesContainerClassName);
 
                 $imagesFound.each(function () {
                     // For each image found in current document

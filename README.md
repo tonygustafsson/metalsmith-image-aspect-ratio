@@ -59,12 +59,13 @@ Metalsmith(__dirnam).use(
     imageAspectRatio({
         pattern: '**/*.html',
         imageExtensions: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
+        imagesContainerClassName: '.article__content img',
     })
 );
 ```
 
-You should add imageAspectRatio() after it has compiled to HTML. You can of course change the pattern for documents and images if you are using different formats.
+You should add imageAspectRatio() after it has compiled to HTML.
 
-```pattern``` defines which files to look for image references in. ```imageExtensions``` defines which types of image extensions the plugin will look for. You will not get the aspect ratio for images not defined here.
+`pattern` defines which files to look for image references in (HTML documents most likely). `imageExtensions` defines which types of image extensions the plugin will look up sizes for. You will not get the aspect ratio for extensions not defined. Lastly `imagesContainerClassName` targets a DOM node on where to find the images in the document (pattern). The plugin needs a way of targeting the articles and not apply it to layouts and such.
 
-That's all there is to it.
+If you are happy with the defaults you can just skip the options :)
